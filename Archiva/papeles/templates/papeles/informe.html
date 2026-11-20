@@ -1,0 +1,11 @@
+{% extends "core/base.html" %}{% block content %}
+<h1>Informe preliminar (borrador de trabajo)</h1><h2>{{ a.nombre }}</h2>
+<div class="msg">Este borrador concentra información. No contiene calificación de hallazgos, causas ni recomendaciones: eso es criterio del auditor.</div>
+<section class="tarjeta"><h2>Objetivos originales</h2><ul>{% for o in objetivos %}<li>{{ o.texto }}</li>{% endfor %}</ul>
+<h2>Adendas</h2><ul>{% for d in adendas %}<li>Adenda {{ d.numero }} ({{ d.fecha|date:"d/m/Y" }}): {{ d.texto_nuevo }}</li>{% empty %}<li>Sin adendas.</li>{% endfor %}</ul></section>
+<h2>Resumen por papel</h2><table><tr><th>Papel</th><th>Título</th><th>Total (Bs)</th><th>Líneas</th></tr>{% for p, t, n in resumen %}<tr><td><a href="{{ p.get_absolute_url }}">{{ p.codigo }}</a></td><td>{{ p.titulo }}</td><td>{{ t }}</td><td>{{ n }}</td></tr>{% endfor %}</table>
+<h2>Diferencias, faltantes y pendientes marcados</h2><table><tr><th>Papel</th><th>Concepto</th><th>Marca</th><th>Nota</th></tr>
+{% for p, l in dif %}<tr><td><a href="{% url 'uai_papel' p.pk %}#l{{ l.pk }}">{{ p.codigo }}</a></td><td>{{ l.concepto }}</td><td>{{ l.marca.simbolo }} {{ l.marca.codigo }}</td><td>{{ l.nota }}</td></tr>{% empty %}<tr><td colspan="4">Ninguno.</td></tr>{% endfor %}</table>
+<p>Líneas con marca confirmada: <b>{{ conf }}</b> de {{ total_l }}{% if pct is not None %} ({{ pct }} %){% endif %}.</p>
+<section class="tarjeta" style="min-height:120px"><h2>Análisis y conclusión del auditor</h2><small>Espacio reservado para el criterio del auditor.</small></section>
+<a href="{{ a.get_absolute_url }}">Volver a la auditoría</a>{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "core/base.html" %}{% block content %}
+<div class="fila"><h1>Papeles de trabajo · UAI</h1><span class="fila"><a class="btn" href="{% url 'uai_cargar' %}">+ Cargar documento al legajo</a><a class="btn sec" href="{% url 'uai_auditoria_nueva' %}">Nueva auditoría</a></span></div>
+<section class="tarjeta"><p>Referenciación, co-referenciación y marcas de auditoría asistidas. <b>Flujo:</b> 1) cargar documentos escaneados (legajo permanente o corriente) · 2) armar papeles con referencias · 3) pedir marcas sugeridas · 4) el auditor confirma · 5) verificar · 6) descargar con marcas · 7) informe preliminar.</p>
+<p><a href="{% url 'uai_legajo_permanente' %}">Legajo permanente</a> ({{ n_lp }} documentos) · <a href="{% url 'uai_marcas' %}">Índice de marcas</a></p></section>
+<table><tr><th>Auditoría</th><th>Unidad auditada</th><th>Papeles</th><th>Documentos</th></tr>
+{% for a in auditorias %}<tr><td><a href="{{ a.get_absolute_url }}">{{ a.nombre }}</a></td><td>{{ a.dependencia_auditada|default:"—" }}</td><td>{{ a.n_papeles }}</td><td>{{ a.n_docs }}</td></tr>
+{% empty %}<tr><td colspan="4">Aún no hay auditorías.</td></tr>{% endfor %}</table>{% endblock %}

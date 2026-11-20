@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}{% block content %}
+<style>tr:target{outline:3px solid #F4B942;background:#FFF3CF}.sug{background:#FFF6DC}.conf{background:#E3F6EF}.num{text-align:right;white-space:nowrap}.marca{font-size:20px;font-weight:700}</style>
+<div class="fila"><h1>{{ p.codigo }} · {{ p.titulo }}</h1><span class="fila">
+{% if editar %}<form method="post" action="{% url 'uai_papel_sugerir' p.pk %}">{% csrf_token %}<button class="btn">Sugerir marcas</button></form>{% endif %}
+<a class="btn sec" href="{% url 'uai_papel_descargar' p.pk 'xlsx' %}">Descargar Excel</a><a class="btn sec" href="{% url 'uai_papel_descargar' p.pk 'docx' %}">Descargar Word</a></span></div>
+<p><small>Elaboró: {{ p.elaborado_por|default:"—" }} · Supervisó: {{ p.supervisado_por|default:"—" }} · <a href="{{ p.auditoria.get_absolute_url }}">{{ p.auditoria.nombre }}</a></small></p>
+<table><tr><th>#</th><th>Concepto</th><th>Importe (Bs)</th><th>Referencia / respaldo</th><th>Marca</th></tr>
+{% for f in filas %}{% with l=f.l %}<tr id="l{{ l.pk }}" class="{% if l.marca_estado == 'confirmada' %}conf{% elif l.marca_estado == 'sugerida' %}sug{% endif %}">
+<td>{{ l.orden }}</td><td>{{ l.concepto }}</td><td class="num">{{ l.importe|default_if_none:"" }}</td>
+<td>{% if f.rota %}<span class="mal">→ {{ l.ref_papel }} (referencia rota)</span><br>{% elif f.ref %}{% if f.ref.0 == "papel" %}<a href="{{ f.ref.1.get_absolute_url }}">→ {{ l.ref_papel }}</a>{% else %}<a href="{{ f.ref.1.documento.get_absolute_url }}">→ {{ l.ref_papel }}</a>{% endif %}<br>{% endif %}
+{% if l.documento %}<a href="{{ l.documento.get_absolute_url }}">{{ l.documento.codigo }}</a>{% if l.folio %} f.{{ l.folio }}{% endif %}{% endif %}</td>
+<td>{% if l.marca %}<span class="marca">{{ l.marca.simbolo }}</span> {{ l.marca.codigo }} <small>({{ l.get_marca_estado_display|lower }}{% if l.confianza %}, confianza {{ l.confianza }}{% endif %})</small>{% if l.nota %}<br><small>{{ l.nota }}</small>{% endif %}{% endif %}
+{% if editar and l.marca_estado != "confirmada" %}<form method="post" action="{% url 'uai_linea_confirmar' l.pk %}" class="fila">{% csrf_token %}<select name="marca" class="campo">{% for m in marcas %}<option value="{{ m.pk }}" {% if m.pk == l.marca_id %}selected{% endif %}>{{ m.simbolo }} {{ m.codigo }} · {{ m.nombre }}</option>{% endfor %}</select><button class="btn chico">{% if l.marca %}Confirmar{% else %}Marcar{% endif %}</button></form>
+{% if l.marca %}<form method="post" action="{% url 'uai_linea_rechazar' l.pk %}">{% csrf_token %}<button class="btn sec chico">Rechazar</button></form>{% endif %}{% endif %}</td></tr>{% endwith %}
+{% empty %}<tr><td colspan="5">Sin líneas.</td></tr>{% endfor %}
+<tr><th></th><th>Total</th><th class="num">{{ total }}</th><th colspan="2"></th></tr></table>
+<section class="tarjeta"><h2>Co-referencias <small>(clic para ir a la referencia de origen)</small></h2><ul>
+{% for c in coref %}<li><a href="{% url 'uai_papel' c.papel_id %}#l{{ c.pk }}">← {{ c.papel.codigo }}</a> · {{ c.concepto }}</li>{% empty %}<li>Ningún papel lo referencia todavía.</li>{% endfor %}</ul></section>
+<section class="tarjeta"><h2>Leyenda de marcas confirmadas</h2><ul>{% for m in leyenda %}<li>{{ m.simbolo }} {{ m.codigo }} — {{ m.significado }}</li>{% empty %}<li>Aún no hay marcas confirmadas.</li>{% endfor %}</ul></section>
+{% if form %}<section class="tarjeta"><h2>Agregar línea</h2><form method="post" action="{% url 'uai_linea_nueva' p.pk %}">{% csrf_token %}
+{% for f in form %}<label>{{ f.label }}{{ f }}{{ f.errors }}</label>{% endfor %}<button class="btn">Agregar</button></form>
+<p><small>En «Referencia» escriba el código de otro papel (ej. C-1.1) o de un documento del legajo permanente (ej. LP-A-001).</small></p></section>{% endif %}{% endblock %}

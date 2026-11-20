@@ -1,0 +1,6 @@
+{% extends "core/base.html" %}{% block content %}
+<section class="tarjeta angosta"><h1>{{ titulo }}</h1>
+<form method="post" {% if multipart %}enctype="multipart/form-data"{% endif %}>{% csrf_token %}
+{% for f in form %}<label>{{ f.label }}{{ f }}{% if f.help_text %}<small>{{ f.help_text }}</small>{% endif %}{{ f.errors }}</label>{% endfor %}
+{{ form.non_field_errors }}
+<div class="fila"><button class="btn">Guardar</button><a class="btn sec" href="javascript:history.back()">Cancelar</a></div></form></section>{% endblock %}

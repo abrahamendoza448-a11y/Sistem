@@ -1,0 +1,10 @@
+# Versión ligera para demostración en Railway (sin OCR). Usa SQLite y datos de ejemplo.
+FROM python:3.12-slim
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+WORKDIR /app
+COPY requirements.txt requirements-prod.txt ./
+RUN pip install --no-cache-dir -r requirements-prod.txt
+COPY . .
+RUN ARCHIVA_DEBUG=1 python manage.py collectstatic --noinput
+# Railway entrega el puerto en la variable PORT.
+CMD ["sh", "-c", "mkdir -p data && python manage.py migrate --noinput && python manage.py seed_demo && python manage.py seed_papeles && exec gunicorn config.wsgi:application -b 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120"]

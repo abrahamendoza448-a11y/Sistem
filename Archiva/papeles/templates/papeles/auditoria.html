@@ -1,0 +1,16 @@
+{% extends "core/base.html" %}{% block content %}
+<div class="fila"><h1>{{ a.nombre }}</h1><span class="fila"><a class="btn sec" href="{% url 'uai_verificador' a.pk %}">Verificador</a><a class="btn sec" href="{% url 'uai_informe' a.pk %}">Informe preliminar</a><a class="btn sec" href="{% url 'uai_libro' a.pk %}">Descargar libro Excel</a></span></div>
+<p>Unidad auditada: {{ a.dependencia_auditada|default:"—" }}</p>
+<section class="tarjeta"><h2>Objetivos (fijos)</h2>
+{% for o, vigente, modificado in objetivos %}<p><b>Objetivo {{ o.numero }}.</b> {{ vigente }}{% if modificado %} <em>(modificado por adenda)</em><br><small>Original: {{ o.texto }}</small>{% endif %}</p>{% endfor %}
+<p><small>Los objetivos no se editan. Solo se cambian mediante una adenda aprobada por el jefe de la UAI.</small></p></section>
+<section class="tarjeta"><div class="fila"><h2>Adendas</h2>{% if puede_aprobar %}<a class="btn sec chico" href="{% url 'uai_adenda_nueva' a.pk %}">+ Nueva adenda</a>{% endif %}</div>
+<table><tr><th>N.º</th><th>Fecha</th><th>Anterior</th><th>Nuevo</th><th>Justificación</th><th>Aprobó</th></tr>
+{% for d in adendas %}<tr><td>Adenda {{ d.numero }}</td><td>{{ d.fecha|date:"d/m/Y" }}</td><td>{{ d.texto_anterior }}</td><td>{{ d.texto_nuevo }}</td><td>{{ d.justificacion }}</td><td>{{ d.aprobada_por }}</td></tr>
+{% empty %}<tr><td colspan="6">Sin adendas.</td></tr>{% endfor %}</table></section>
+<section class="tarjeta"><div class="fila"><h2>Legajo corriente · documentos</h2><a class="btn sec chico" href="{% url 'uai_cargar' %}?auditoria={{ a.pk }}">+ Cargar documento</a></div>
+<table><tr><th>Código</th><th>Título</th></tr>{% for d in docs %}<tr><td><b>{{ d.codigo_archivo }}</b></td><td><a href="{{ d.documento.get_absolute_url }}">{{ d.documento.titulo }}</a></td></tr>
+{% empty %}<tr><td colspan="2">Sin documentos.</td></tr>{% endfor %}</table></section>
+<section class="tarjeta"><div class="fila"><h2>Papeles de trabajo</h2>{% if puede_editar %}<a class="btn sec chico" href="{% url 'uai_papel_nuevo' a.pk %}">+ Nuevo papel</a>{% endif %}</div>
+<table><tr><th>Código</th><th>Título</th></tr>{% for p in papeles %}<tr><td><a href="{{ p.get_absolute_url }}">{{ p.codigo }}</a></td><td>{{ p.titulo }}</td></tr>
+{% empty %}<tr><td colspan="2">Sin papeles.</td></tr>{% endfor %}</table></section>{% endblock %}

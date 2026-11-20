@@ -1,0 +1,6 @@
+{% extends "core/base.html" %}{% block content %}
+<div class="fila"><h1>Legajo permanente</h1><a class="btn" href="{% url 'uai_cargar' %}">+ Cargar documento</a></div>
+<p>Información estable de la entidad. Se referencia desde cualquier legajo corriente, sin duplicarse, escribiendo su código en la referencia de la línea.</p>
+<table><tr><th>Código</th><th>Título</th><th>Sección</th><th>Cargado</th></tr>
+{% for d in docs %}<tr><td><b>{{ d.codigo_archivo }}</b></td><td><a href="{{ d.documento.get_absolute_url }}">{{ d.documento.titulo }}</a></td><td>{{ d.area }}</td><td>{{ d.documento.creado|date:"d/m/Y" }}</td></tr>
+{% empty %}<tr><td colspan="4">Sin documentos en el legajo permanente.</td></tr>{% endfor %}</table>{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "core/base.html" %}{% block content %}
+<div class="fila"><h1>Índice-tabla de marcas estandarizadas</h1>{% if puede_aprobar %}<a class="btn" href="{% url 'uai_marca_nueva' %}">+ Agregar marca</a>{% endif %}</div>
+<p>Una marca usada nunca se borra: se <b>retira</b> y conserva su significado histórico. Cada UAI debe contrastar esta tabla con su manual y con las guías de la CGE.</p>
+<table><tr><th>Marca</th><th>Código</th><th>Nombre</th><th>Significado y uso</th><th>Estado</th><th></th></tr>
+{% for m in marcas %}<tr><td style="font-size:20px;font-weight:700">{{ m.simbolo }}</td><td>{{ m.codigo }}</td><td>{{ m.nombre }}</td><td>{{ m.significado }}<br><small>{{ m.uso }}</small></td><td>{{ m.get_estado_display }} v{{ m.version }}<br><small>{{ m.aprobado_por|default:m.aprobacion_texto }}</small></td>
+<td>{% if puede_aprobar and m.estado == "vigente" %}<form method="post" action="{% url 'uai_marca_retirar' m.pk %}">{% csrf_token %}<button class="btn sec chico">Retirar</button></form>{% endif %}</td></tr>{% endfor %}</table>{% endblock %}

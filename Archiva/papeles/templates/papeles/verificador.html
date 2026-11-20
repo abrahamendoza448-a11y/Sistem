@@ -1,0 +1,6 @@
+{% extends "core/base.html" %}{% block content %}
+<h1>Verificador · {{ a.nombre }}</h1><p>Controla completitud y consistencia de forma. No evalúa el fondo: eso es criterio del auditor.</p>
+<table><tr><th>Papel</th><th>Control</th><th>Detalle</th></tr>
+{% for p, c, d in hallazgos %}<tr><td><a href="{{ p.get_absolute_url }}">{{ p.codigo }}</a></td><td>{{ c }}</td><td>{{ d }}</td></tr>
+{% empty %}<tr><td colspan="3">Sin hallazgos de forma. Lista para la revisión del supervisor.</td></tr>{% endfor %}</table>
+<a href="{{ a.get_absolute_url }}">Volver a la auditoría</a>{% endblock %}
